@@ -7,7 +7,7 @@ RUN apt-get -y update
 # Install GCC and dependencies
 RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
 RUN apt-get install -y wget bzip2 autoconf automake make cmake gcc g++ perl zlib1g-dev libbz2-dev liblzma-dev \
-    libcurl4-gnutls-dev libssl-dev libncurses5-dev git
+    libcurl4-gnutls-dev libssl-dev libncurses5-dev git python3
 
 
 # Start building
@@ -21,7 +21,7 @@ RUN git clone https://github.com/algbio/themisto.git \
     && git submodule update \
     && cd build \
     && cmake .. -DMAX_KMER_LENGTH=31 \
-    && make -j \
+    && make -j
 
 # Get MONI
 WORKDIR /usr/src/
@@ -29,9 +29,10 @@ RUN git clone https://github.com/marco-oliva/moni.git \
     && cd moni \
     && mkdir build \
     && cd build \
-    && cmake -DCMAKE_INSTALL_PERFIX=/sfs/bin .. \
+    && cmake -DCMAKE_INSTALL_PREFIX=/sfs/bin .. \
     && make -j \
     && make install
+
 
 # Get binaries
 WORKDIR /sfs/bin
