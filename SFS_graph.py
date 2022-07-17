@@ -122,6 +122,7 @@ def main():
     parser = argparse.ArgumentParser(description=Description, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-r', '--reference', help='reference file name', type=str, required=True, dest='reference')
     parser.add_argument('-p', '--pattern', help='the input query', type=str, required=True, dest='pattern')
+    parser.add_argument('-k', help='kmer length', type=int, required=True, dest='k')
     args = parser.parse_args()
 
     # Build index
@@ -155,6 +156,8 @@ def main():
         mems_per_read = extract_mems(lengths_file_name, pointers_file_name)
         for read, mems_list in mems_per_read.items():
             for mem in mems_list:
+                if len(mem) < args.k:
+                    continue
                 colors_list.append(0)
                 seq = Seq(string_reference[mem[0]:mem[1]])
                 record = SeqRecord(seq, "MEM From:\t{}".format(read), "", "")
@@ -164,6 +167,8 @@ def main():
         sss_per_read, _ = read_sss_file(sfs_file_name)
         for read, sss_list in sss_per_read.items():
             for super_sss in super_specific_strings(sss_list):
+                if len(super_sss) < args.k:
+                    continue
                 colors_list.append(1)
                 seq = Seq(super_sss[0])
                 record = SeqRecord(seq, "SSS From:\t{}".format(read), "", "")
@@ -174,7 +179,7 @@ def main():
             out_colors_handle.write(str(color) + '\n')
 
     # Create graph
-    create_graph = "themisto build --node-length 30 -i {} -c {} --index-prefix {} --temp-dir tmp".format(out_sequences, out_colors, out_graph_prefix)
+    create_graph = "themisto build --node-length {} -i {} -c {} --index-prefix {} --temp-dir tmp".format(args.k, out_sequences, out_colors, out_graph_prefix)
     execute_command(create_graph)
 
 if __name__ == '__main__':
