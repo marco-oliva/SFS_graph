@@ -7,8 +7,7 @@ RUN apt-get -y update
 # Install GCC and dependencies
 RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
 RUN apt-get install -y wget bzip2 autoconf automake make cmake gcc g++ perl zlib1g-dev libbz2-dev liblzma-dev \
-    libcurl4-gnutls-dev libssl-dev libncurses5-dev git python3
-
+    libcurl4-gnutls-dev libssl-dev libncurses5-dev git python3 python3-pip
 
 # Start building
 COPY . /usr/src/SFS_graph
@@ -29,10 +28,12 @@ RUN git clone https://github.com/marco-oliva/moni.git \
     && cd moni \
     && mkdir build \
     && cd build \
-    && cmake -DCMAKE_INSTALL_PREFIX=/sfs/bin .. \
+    && cmake -DCMAKE_INSTALL_PREFIX=/sfs .. \
     && make -j \
     && make install
 
+# Get python dependencies
+RUN pip install biopython
 
 # Get binaries
 WORKDIR /sfs/bin
@@ -40,4 +41,5 @@ RUN cp /usr/src/themisto/build/bin/themisto .
 RUN cp /usr/src/SFS_graph/SFS_graph.py .
 RUN chmod +x SFS_graph.py
 
+WORKDIR /root
 ENV PATH /sfs/bin:$PATH
