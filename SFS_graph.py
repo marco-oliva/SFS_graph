@@ -156,7 +156,7 @@ def main():
         mems_per_read = extract_mems(lengths_file_name, pointers_file_name)
         for read, mems_list in mems_per_read.items():
             for mem in mems_list:
-                if len(mem) < args.k:
+                if (mem[1] - mem[0]) < args.k:
                     continue
                 colors_list.append(0)
                 seq = Seq(string_reference[mem[0]:mem[1]])
@@ -167,7 +167,7 @@ def main():
         sss_per_read, _ = read_sss_file(sfs_file_name)
         for read, sss_list in sss_per_read.items():
             for super_sss in super_specific_strings(sss_list):
-                if len(super_sss) < args.k:
+                if len(super_sss[0]) < args.k:
                     continue
                 colors_list.append(1)
                 seq = Seq(super_sss[0])
